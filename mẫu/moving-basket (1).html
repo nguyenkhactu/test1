@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Moving Basket</title>
+
+
+</head>
+<body>
+<div style="background-color: #e6f2ff;">
+<canvas id="canvas" width="1200" height="700" style="border: solid 1px; background: #e6f2ff"></canvas>
+</div>
+
+<script src="gift.js"></script>
+<script src="basket.js"></script>
+<script src="obstacle.js"></script>
+<script>
+    let myBasket = new Basket(0,400,200,100,"image/basket2.png",40);
+
+    let rectangle1 = new Rectangle(100,0,50,50,30,'yellow');
+    let rectangle2 = new Rectangle(400,0,90,90,40,'blue');
+    let rectangle3 = new Rectangle(900,0,120,120,50,'red');
+    let gift  = [rectangle1, rectangle2, rectangle3];
+
+    let obstacle1 = new Obstacle(200,100,30,5);
+    let obstacle2 = new Obstacle(400,100,30,10);
+    let obstacle3 = new Obstacle(800,100,30,15);
+    let obstacle = [obstacle1,obstacle2,obstacle3];
+
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext('2d');
+    myBasket.drawBasket(ctx);
+
+    function moveBasket(event) {
+        switch (event.key) {
+            case('ArrowUp'): {
+                if(myBasket.y < 0){
+                    return;
+                }
+                myBasket.moveUp();
+                break;
+            }
+            case('ArrowDown'): {
+                if(myBasket.y + myBasket.height > canvas.clientHeight){
+                    return;
+                }
+                myBasket.moveDown();
+                break;
+            }
+            case('ArrowRight'): {
+                if(myBasket.x+myBasket.width > canvas.clientWidth){
+                    return;
+                }
+                myBasket.moveRight();
+                break;
+            }
+            case('ArrowLeft'): {
+                if(myBasket.x < 0){
+                    return;
+                }
+                myBasket.moveLeft();
+                break;
+            }
+        }
+        updateCanvas();
+        checkCollisionGift();
+        // checkCollisionObstacle();
+    }
+
+    function drawGift(){
+        for(let i = 0; i < gift.length; i++){
+            gift[i].drawRect(ctx);
+        }
+    }
+
+    function moveGift() {
+        for (let i = 0; i < gift.length; i++) {
+            if (gift[i].y > canvas.clientHeight) {
+                gift[i].y = 0;
+                gift[i].x = Math.floor(Math.random() * 1200);
+            }
+            gift[i].moveDown();
+            updateCanvas();
+            checkCollisionGift();
+        }
+    }
+
+    function drawObstacle(){
+        for(let i = 0; i < obstacle.length; i++){
+            obstacle[i].drawObstacle(ctx);
+        }
+    }
+    function moveObstacle(){
+        for(let i = 0; i < obstacle.length; i++){
+            if(obstacle[i].y > canvas.clientHeight){
+                obstacle[i].y = 0;
+                obstacle[i].x = Math.floor(Math.random()*canvas.clientWidth);
+            }
+            obstacle[i].moveDown();
+            updateCanvas();
+            checkCollisionObstacle();
+            checkGameOver();
+        }
+    }
+
+
+    function clearCanvas(){
+        ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    }
+
+    function updateCanvas(){
+        clearCanvas();
+        myBasket.drawBasket(ctx);
+        drawGift();
+        drawObstacle();
+        showScore();
+        showLive();
+        showRestart()
+    }
+
+
+
+    let score = 0;
+    function showScore(){
+        ctx.font = "30px Arial";
+        ctx.fillStyle = 'black';
+        ctx.fillText("Your score is: " + score, 10, 170);
+    }
+    function checkCollisionGift(){
+        for(let i = 0; i < gift.length; i++) {
+            if (myBasket.x > gift[i].x - myBasket.width && myBasket.x < gift[i].x + gift[i].width && myBasket.y < gift[i].y
+                + gift[i].height && myBasket.y + myBasket.height > gift[i].y) {
+                score++;
+                clearCanvas();
+                let newX = Math.floor(Math.random()*canvas.clientWidth);
+                let newSpeed = Math.floor(Math.random()*20 + 30);
+                let newRectangle = new Rectangle(newX,0,gift[i].width,gift[i].height,newSpeed,gift[i].color);
+                gift.splice(i,1,newRectangle);
+                // console.log(gift);
+                updateCanvas();
+            }
+        }
+    }
+
+    let live = 3;
+    let gameStatus = 'play';
+    function checkCollisionObstacle(){
+        for(let i = 0; i < obstacle.length; i++){
+        if(myBasket.x < obstacle[i].x + obstacle[i].radius && myBasket.x > obstacle[i].x - myBasket.width - obstacle[i].radius
+            && myBasket.y < obstacle[i].y+obstacle[i].radius
+            && myBasket.y > obstacle[i].y-myBasket.height-obstacle[i].radius) {
+            live--;
+            let newX = Math.floor(Math.random() * canvas.clientWidth);
+            let newObstacle = new Obstacle(newX, 0, obstacle[i].radius, obstacle[i].speed);
+            obstacle.splice(i, 1, newObstacle);
+            updateCanvas();
+            // alert('You lose 1 point');
+        }
+        }
+        if(live === 0){
+            gameStatus = 'over';
+        }
+        console.log(gameStatus);
+    }
+
+    function showLive(){
+        ctx.font = "30px Arial";
+        ctx.fillStyle = 'black';
+        ctx.fillText("You have: " + live + " lives", 10, 210);
+    }
+
+        function showGameOver(){
+            let img = new Image();
+            img.src = 'image/gameover.png';
+            img.onload = function (){
+                ctx.drawImage(img,canvas.clientWidth/2-150,canvas.clientHeight/2-150,250,250);
+            }
+        }
+
+    function checkGameOver(){
+    if(gameStatus === 'over'){
+        showGameOver();
+        clearInterval(interval1);
+        clearInterval(interval2);
+    }
+    }
+
+    function showRestart(){
+        let img = new Image();
+        img.src = "image/restart.jpg";
+        // img.onload = function () {}
+        ctx.drawImage(img,0,0,130,130);
+    }
+
+    drawGift();
+    drawObstacle();
+    showScore();
+    showLive();
+    showRestart();
+    myBasket.drawBasket(ctx);
+    window.addEventListener('keydown',moveBasket);
+    let interval1 = setInterval(moveGift, 500);
+    let interval2 = setInterval(moveObstacle, 50);
+    // window.onload = checkCollisionGift();
+
+
+    function run(){
+        location.reload();
+    }
+
+    function restart(event){
+        if(event.clientX < 130 && event.clientY < 130){
+            run();
+        }
+    }
+    canvas.addEventListener('click',restart);
+
+</script>
+</body>
+</html>

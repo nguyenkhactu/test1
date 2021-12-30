@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>nhap</title>
+
+
+</head>
+<body>
+<canvas id="MyCanvas" width="1500" height="700" style="border:2px solid red"></canvas>
+<script>
+    let canvas = document.getElementById("MyCanvas")
+    let ctx = canvas.getContext("2d");
+</script>
+<script>//clas cay
+
+class Tree {
+    _x;
+    _y;
+    _width;
+    _height;
+    _src;
+
+    get x() {
+        return this._x;
+    }
+
+    set x(value) {
+        this._x = value;
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set y(value) {
+        this._y = value;
+    }
+
+    get width() {
+        return this._width;
+    }
+
+    set width(value) {
+        this._width = value;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    set height(value) {
+        this._height = value;
+    }
+
+    get src() {
+        return this._src;
+    }
+
+    set src(value) {
+        this._src = value;
+    }
+
+    constructor(x, y, width, height, src) {
+        this._x = x;
+        this._y = y;
+        this._width = width;
+        this._height = height;
+        this._src = src;
+    }
+
+    drawTree(ctx) {
+        let image = new Image();
+        image.src = this._src;
+        ctx.beginPath();
+        //image.onload = () => {
+        ctx.drawImage(image, this._x, this._y, this._width, this._height,)
+         //}
+    }
+}
+
+
+</script>
+<script>//class wind
+class Wind {
+    _x;
+    _y;
+    _width;
+    _height;
+    _src;
+    _speed;
+
+    get x() {
+        return this._x;
+    }
+
+    set x(value) {
+        this._x = value;
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set y(value) {
+        this._y = value;
+    }
+
+    get width() {
+        return this._width;
+    }
+
+    set width(value) {
+        this._width = value;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    set height(value) {
+        this._height = value;
+    }
+
+    get src() {
+        return this._src;
+    }
+
+    set src(value) {
+        this._src = value;
+    }
+
+    get speed() {
+        return this._speed;
+    }
+
+    set speed(value) {
+        this._speed = value;
+    }
+
+    constructor(x, y, width, height, src, speed) {
+        this._x = x;
+        this._y = y;
+        this._width = width;
+        this._height = height;
+        this._src = src;
+        this._speed = speed;
+    }
+
+    moveDownleft() {
+        this._x -= this._speed;
+        this._y += this._speed;
+    };
+    moveDownright() {
+        this._x += this._speed;
+        this._y += this._speed;
+    }
+
+    drawWind1() {
+
+        let windIMage = new Image();
+        ctx.beginPath()
+        windIMage.src = this._src;
+         windIMage.onload = () => {
+            ctx.drawImage(windIMage, this._x, this._y, this._width, this._height)
+        }
+    }
+}
+
+
+</script>
+<script>// function
+
+let imgList = [  , 'imgWind/wind1.png', 'imgWind/wind2.png', 'imgWind/wind3.png', 'imgWind/wind4.png'];
+let myWind1 = new Wind(Math.random() * canvas.clientWidth, Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind2 = new Wind(Math.random() * canvas.clientWidth, Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind3 = new Wind(Math.random() * canvas.clientWidth, Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind4 = new Wind(Math.random() * canvas.clientWidth, Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind5 = new Wind(Math.random() * canvas.clientWidth, Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind6 = new Wind(Math.random() * canvas.clientWidth,Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind7 = new Wind(Math.random() * canvas.clientWidth,Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let myWind8 = new Wind(Math.random() * canvas.clientWidth, Math.random() * 200, 40, 40, "imgWind/wind1.png",Math.random()*30);
+let arrayWind = [myWind1, myWind2, myWind3, myWind4,myWind5,myWind6,myWind7,myWind8];
+function clearCanvas() {
+    ctx.clearRect(0, 0, 1500, 700);
+}
+
+function drawIimage(j) {
+    for (let i = 0; i < imgList.length; i++) {
+        let temp = imgList[2];
+        imgList.shift();
+        imgList.push(temp)
+        arrayWind[j]._src = imgList[0];
+    }
+}
+
+function collision(j) {//va chạm
+    if (arrayWind[j].y > canvas.clientHeight || arrayWind[j].x > canvas.clientWidth) {
+        arrayWind[j].x = Math.random() * canvas.clientWidth;
+        arrayWind[j].y = Math.random() * canvas.clientHeight/5;
+    }
+    if (arrayWind[j].x < canvas.clientWidth/2 && arrayWind[j].x>0){
+        return(arrayWind[j].moveDownright());
+    }
+    if (arrayWind[j].x > canvas.clientWidth/2 && arrayWind[j].x < canvas.clientWidth){
+        return (arrayWind[j].moveDownleft());
+    }
+}
+
+
+let tree = new Tree(700, 500, 100, 100, 4, 'imgTree/newtree.png')
+tree.drawTree(ctx);
+
+
+function moveTree(move) {
+    switch (event.keyCode) {
+        case 37: {
+            clearCanvas();
+            tree._src = 'imgTree/treeleft.png'
+            tree.drawTree(ctx)
+            break
+        }
+        case 39: {
+            clearCanvas();
+            tree._src = 'imgTree/treeright.png';
+            tree.drawTree(ctx)
+            break;
+        }
+        case 40: {
+            clearCanvas();
+            tree._src = 'imgTree/newtree.png'
+            tree.drawTree(ctx)
+            break;
+        }
+        case 38: {
+            clearCanvas();
+            tree._src = 'imgTree/newtree.png'
+            tree.drawTree(ctx)
+            break;
+        }
+    }
+}
+
+
+function canvasUpdat() {
+    for (let j = 0; j < arrayWind.length; j++) {
+
+        collision(j)//xét đk va chạm
+        clearCanvas()
+        drawIimage(j)//gán lại địa chỉ ảnh
+        arrayWind[j].drawWind1(ctx);
+
+        tree.drawTree(ctx)
+    }
+}
+
+document.addEventListener('keydown', moveTree);
+setInterval(canvasUpdat, 100)
+
+</script>
+</body>
+</html>
