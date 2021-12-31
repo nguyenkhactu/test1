@@ -67,6 +67,7 @@ class Wind {
         this._x -= this._speed;
         this._y += this._speed;
     };
+
     moveDownright() {
         this._x += this._speed;
         this._y += this._speed;
